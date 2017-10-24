@@ -1,6 +1,7 @@
 {
   "name": "places-pub",
   "license": "Apache-2.0",
+  "repository": "evanp/places-pub",
   "devDependencies": {
     "bower": "^1.8.2",
     "eslint": "^3.19.0",
