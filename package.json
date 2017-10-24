@@ -2,6 +2,7 @@
   "name": "places-pub",
   "license": "Apache-2.0",
   "devDependencies": {
+    "bower": "^1.8.2",
     "eslint": "^3.19.0",
     "eslint-config-google": "^0.7.0",
     "eslint-config-standard": "^10.2.1",
@@ -10,6 +11,7 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
+    "polymer-cli": "^1.5.7",
     "remark-lint": "^6.0.1"
   },
   "scripts": {
