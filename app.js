@@ -11,6 +11,9 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
 })
 
-app.listen(8080)
+const DEFAULT_PORT = 8080
+const port = (process.env.PORT) ? parseInt(process.env.PORT, 10) : DEFAULT_PORT
 
-console.log('Server listening on localhost:8080')
+app.listen(port)
+
+console.log(`Server listening on localhost:${port}`)
