@@ -1,7 +1,7 @@
 {
-  "name": "My App",
-  "short_name": "My App",
-  "description": "My App description",
+  "name": "Places.pub",
+  "short_name": "Places.pub",
+  "description": "A place to find places",
   "icons": [
     {
       "src": "images/manifest/icon-192x192.png",
