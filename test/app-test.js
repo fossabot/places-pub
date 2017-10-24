@@ -1,4 +1,4 @@
-// index.js -- index for places.pub
+// app-test.js -- test the app runs correctly
 //
 // Copyright 2017 Evan Prodromou <evan@prodromou.name>
 //
@@ -14,12 +14,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const express = require('express')
-const router = express.Router()
-
-/* GET home page. */
-router.get('/', (req, res, next) => {
-  res.render('index', { title: 'Express' })
-})
-
-module.exports = router
+import {spawn} from 'child_process'
+import 'vows'
