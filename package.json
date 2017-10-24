@@ -13,6 +13,7 @@
     "remark-lint": "^6.0.1"
   },
   "scripts": {
+    "start": "node app.js",
     "lint": "npm run lint:javascript && polymer lint",
     "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
     "test": "polymer test",
