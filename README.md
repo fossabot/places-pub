@@ -1,125 +1,98 @@
-# Polymer App Toolbox - Starter Kit
+# places.pub
 
-[![Build Status](https://travis-ci.org/PolymerElements/polymer-starter-kit.svg?branch=master)](https://travis-ci.org/PolymerElements/polymer-starter-kit)
+[![Build Status](https://travis-ci.org/evanp/places-pub.svg?branch=master)](https://travis-ci.org/evanp/places-pub)
 
-This template is a starting point for building apps using a drawer-based
-layout. The layout is provided by `app-layout` elements.
+This is the source code for the [places.pub](https://places.pub/) service. It
+provides a vocabulary for [Activity Streams 2.0](https://www.w3.org/TR/activitystreams-core/) [Place](https://www.w3.org/TR/activitystreams-vocabulary/#dfn-place) objects,
+using the [OpenStreetMap](https://openstreetmap.org/) vocabulary.
 
-This template, along with the `polymer-cli` toolchain, also demonstrates use
-of the "PRPL pattern" This pattern allows fast first delivery and interaction with
-the content at the initial route requested by the user, along with fast subsequent
-navigation by pre-caching the remaining components required by the app and
-progressively loading them on-demand as the user navigates through the app.
+## LICENSE
 
-The PRPL pattern, in a nutshell:
+Copyright 2017 Evan Prodromou <mailto:evan@prodromou.name>
 
-* **Push** components required for the initial route
-* **Render** initial route ASAP
-* **Pre-cache** components for remaining routes
-* **Lazy-load** and progressively upgrade next routes on-demand
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-### Migrating from Polymer Starter Kit v1?
+    http://www.apache.org/licenses/LICENSE-2.0
 
-[Check out our blog post that covers what's changed in PSK2 and how to migrate!](https://www.polymer-project.org/1.0/blog/2016-08-18-polymer-starter-kit-or-polymer-cli.html)
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-### Quickstart
+## How to use it
 
-We've recorded a Polycast to get you up and running with PSK2 fast!
+There are three important kinds of URLs for places.pub, as defined by the following [URI templates](https://tools.ietf.org/html/rfc6570).
 
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=HgJ0XCyBwzY&list=PLNYkxOF6rcIDdS7HWIC_BYRunV6MHs5xo&index=10">
-    <img src="https://img.youtube.com/vi/HgJ0XCyBwzY/0.jpg" alt="Polymer Starter Kit 2 video">
-  </a>
-</p>
+### <https://places.pub/osm/{id}>
 
-### Setup
+Represents a single place defined by the OpenStreetMap ID number `id`.
 
-##### Prerequisites
+The server will do [content negotation](https://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html) to figure out what kind of content to return. This will usually be either HTML or Activity Streams 2.0 JSON.
 
-First, install [Polymer CLI](https://github.com/Polymer/polymer-cli) using
-[npm](https://www.npmjs.com) (we assume you have pre-installed [node.js](https://nodejs.org)).
+### <https://places.pub/osm/search?{?q,lang,lat,lon,d}>
 
-    npm install -g polymer-cli
+Finds OpenStreetMap places that match the search terms, possibly within a bounding box.
 
-Second, install [Bower](https://bower.io/) using [npm](https://www.npmjs.com)
+*   `q`: Free text search term, like `Montreal` or `Slanted Door`. Optional.
+*   `lang`: Language code for the free text search term. Optional, defaults to
+    Esperanto, `eo`. Kial ne?
+*   `lat`: Latitude of center of bounding box, in decimal form. Optional.
+    Generates an error if provided without `lon`.
+*   `lon`: Longitude of center of bounding box, in decimal form. Optional.
+    Generates an error if provided without `lon`.
+*   `d`: Half of the length of one edge of the bounding box, in meters.
+    Generates an error if provided without `lat` and `lon`.  Optional.
+    Defaults to 50.
+*   `limit`: Number of places to return. Defaults to 10.
+*   `offset`: Number of places to skip. Defaults to 0.
+*   `before`: Show `count` items that would be shown *before* this item, not
+    inclusive. So, given numerical sorting, `search?count=3&before=9` would return
+    values 6, 7, and 8. (Note: just an example. The relevance is more complicated than this,
+    and that's not how OSM IDs work!).
+*   `after`: Show `count` items that would be shown *after* this item, not
+    inclusive. So, given numerical sorting, `search?count=3&after=9` would return
+    values 10, 11, and 12. (Note: just an example. The relevance is more complicated than this,
+    and that's not how OSM IDs work!).
 
-    npm install -g bower
+Some examples of good queries:
 
-##### Initialize project from template
+*   <https://places.pub/osm/search?q=Montréal?lang=fr>
+*   <https://places.pub/osm/search?q=Montreal?lang=en>
+*   <https://places.pub/osm/search?lat=52.36304325&lon=4.88285962668329>
+*   <https://places.pub/osm/search?q=de+Balie&lat=52.36304325&lon=4.88285962668329>
+*   <https://places.pub/osm/search?q=de+Balie&lat=52.36304325&lon=4.88285962668329&d=100>
+*   <https://places.pub/osm/search?q=McDonalds&offset=240&limit=10>
+*   <https://places.pub/osm/search?q=McDonalds&before=N433592579>
+*   <https://places.pub/osm/search?q=McDonalds&after=N433592579&limit=10>
 
-    mkdir my-app
-    cd my-app
-    polymer init polymer-2-starter-kit
+The server will do [content negotation](https://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html) to figure out what kind of content to return. This will usually be either HTML or Activity Streams 2.0 JSON.
 
-### Start the development server
+If it is AS2, it will be a paged [collection](https://www.w3.org/TR/activitystreams-core/#collections) of Place objects.
+The `first`, `last`, `next` and `prev` properties are useful for paging.
 
-This command serves the app at `http://127.0.0.1:8081` and provides basic URL
-routing for the app:
+### <https://places.pub/osm/version>
 
-    polymer serve
+Returns the version of the places.pub API currently in use. This follows [semantic versioning](http://semver.org/), such that:
 
-### Build
+    Given a version number MAJOR.MINOR.PATCH, increment the:
 
-The `polymer build` command builds your Polymer application for production, using build configuration options provided by the command line or in your project's `polymer.json` file.  
+      MAJOR version when you make incompatible API changes,
+      MINOR version when you add functionality in a backwards-compatible manner, and
+      PATCH version when you make backwards-compatible bug fixes.
 
-You can configure your `polymer.json` file to create multiple builds. This is necessary if you will be serving different builds optimized for different browsers. You can define your own named builds, or use presets. See the documentation on [building your project for production](https://www.polymer-project.org/2.0/toolbox/build-for-production) for more information.
+    Additional labels for pre-release and build metadata are available as
+    extensions to the MAJOR.MINOR.PATCH format.
 
-The Polymer Starter Kit is configured to create three builds using [the three supported presets](https://www.polymer-project.org/2.0/toolbox/build-for-production#build-presets):
+(...as stated on the Semver site.) Note that this will probably but not
+necessarily track to the places.pub software version.
 
-```
-"builds": [
-  {
-    "preset": "es5-bundled"
-  },
-  {
-    "preset": "es6-bundled"
-  },
-  {
-    "preset": "es6-unbundled"
-  }
-]
-```
+The server will do [content negotation](https://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html) to figure out what kind of content to return. This will usually be either HTML or JSON.
 
-Builds will be output to a subdirectory under the `build/` directory as follows:
+If it is JSON, it will be single string, containing the version.
 
-```
-build/
-  es5-bundled/
-  es6-bundled/
-  es6-unbundled/
-```
-
-* `es5-bundled` is a bundled, minified build with a service worker. ES6 code is compiled to ES5 for compatibility with older browsers.
-* `es6-bundled` is a bundled, minified build with a service worker. ES6 code is served as-is. This build is for browsers that can handle ES6 code - see [building your project for production](https://www.polymer-project.org/2.0/toolbox/build-for-production#compiling) for a list.
-* `es6-unbundled` is an unbundled, minified build with a service worker. ES6 code is served as-is. This build is for browsers that support HTTP/2 push.
-
-Run `polymer help build` for the full list of available options and optimizations. Also, see the documentation on the [polymer.json specification](https://www.polymer-project.org/2.0/docs/tools/polymer-json) and [building your Polymer application for production](https://www.polymer-project.org/2.0/toolbox/build-for-production).
-
-### Preview the build
-
-This command serves your app. Replace `build-folder-name` with the folder name of the build you want to serve.
-
-    polymer serve build/build-folder-name/
-
-### Run tests
-
-This command will run [Web Component Tester](https://github.com/Polymer/web-component-tester)
-against the browsers currently installed on your machine:
-
-    polymer test
-
-If running Windows you will need to set the following environment variables:
-
-- LAUNCHPAD_BROWSERS
-- LAUNCHPAD_CHROME
-
-Read More here [daffl/launchpad](https://github.com/daffl/launchpad#environment-variables-impacting-local-browsers-detection)
-
-### Adding a new view
-
-You can extend the app by adding more views that will be demand-loaded
-e.g. based on the route, or to progressively render non-critical sections of the
-application. Each new demand-loaded fragment should be added to the list of
-`fragments` in the included `polymer.json` file. This will ensure those
-components and their dependencies are added to the list of pre-cached components
-and will be included in the build.
+In the future, if there are incompatible versions of this API, we'll probably
+do something to make sure old software doesn't break, like move the new
+version of the API to `/osm/v2/` or something.
