@@ -14,54 +14,24 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-const {join} = require('path')
-const {fork} = require('child_process')
-
-const waitForPort = require('wait-for-port')
 const fetch = require('node-fetch')
 
 const vows = require('perjury')
 const {assert} = vows
 
+const Server = require('./server')
+
 const env = {
   PORT: 8081
-}
-
-const startServer = async function (path, env, host, port) {
-  const child = fork(path, [], {env: env, silent: true})
-  return new Promise((resolve, reject) => {
-    waitForPort(host, port, (err) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(child)
-      }
-    })
-  })
-}
-
-const stopServer = async function (child) {
-  return new Promise((resolve, reject) => {
-    child.once('close', (code, signal) => {
-      if (code !== 0) {
-        reject(new Error('child exited with an error'))
-      } else {
-        resolve(code, signal)
-      }
-    })
-    child.once('error', (err) => {
-      reject(err)
-    })
-    child.kill()
-  })
 }
 
 vows.describe('app loads and listens on correct port')
   .addBatch({
     'When we start the app': {
       topic: async function () {
-        const filename = join(__dirname, '..', 'app.js')
-        return startServer(filename, env, 'localhost', env.PORT)
+        const server = new Server(env)
+        await server.start()
+        return server
       },
       'it works': (err, child) => {
         assert.ifError(err)
@@ -77,8 +47,8 @@ vows.describe('app loads and listens on correct port')
           assert.isString(body)
         }
       },
-      'teardown': (child) => {
-        return stopServer(child)
+      'teardown': (server) => {
+        return server.stop()
       }
     }
   })
