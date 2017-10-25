@@ -12,14 +12,17 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
+    "node-fetch": "^1.7.3",
+    "perjury": "^1.0.3",
     "polymer-cli": "^1.5.7",
-    "remark-lint": "^6.0.1"
+    "remark-lint": "^6.0.1",
+    "wait-for-port": "0.0.2"
   },
   "scripts": {
     "start": "node app.js",
     "lint": "npm run lint:javascript && polymer lint",
     "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
-    "test": "polymer test",
+    "test": " perjury test/*-test.js",
     "test:integration": "polymer build # test that psk builds without error with the CLI"
   },
   "dependencies": {
