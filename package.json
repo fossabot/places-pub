@@ -12,7 +12,6 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "node-fetch": "^1.7.3",
     "perjury": "^1.0.3",
     "polymer-cli": "^1.5.7",
     "remark-lint": "^6.0.1",
@@ -26,6 +25,7 @@
     "test:integration": "polymer build # test that psk builds without error with the CLI"
   },
   "dependencies": {
+    "node-fetch": "^1.7.3",
     "express": "^4.16.2"
   }
 }
