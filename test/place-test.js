@@ -60,6 +60,20 @@ vows.describe('place endpoint')
           assert.isNumber(body.longitude)
         }
       },
+      'and we fetch a place that does not exist': {
+        topic: async function () {
+          const headers = {
+            'Accept': 'application/activity+json;1.0,application/ld+json;0.5,application/json;0.1'
+          }
+          const url = `http://${env.HOSTNAME}:${env.PORT}/osm/WNOTANID`
+          return fetch(url, {headers: headers})
+        },
+        'it works': (err, res) => {
+          assert.ifError(err)
+          assert.isObject(res)
+          assert.equal(res.status, 404)
+        }
+      },
       'teardown': (server) => {
         return server.stop()
       }
