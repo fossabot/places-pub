@@ -16,14 +16,73 @@
 
 const express = require('express')
 const path = require('path')
+const fetch = require('node-fetch')
+const qs = require('querystring')
+
+const AS2 = 'https://www.w3.org/ns/activitystreams'
 
 const app = express()
+
+function makeURI (path) {
+  return `${process.env.URL_ROOT}${path}`
+}
 
 app.use(express.static(__dirname))
 app.use(express.static(path.join(__dirname, 'src')))
 
+// Place route
+
+app.get('/osm/:id', async (req, res, next) => {
+  const {id} = req.params
+  const qa = {
+    osm_ids: id,
+    format: 'json',
+    namedetails: 1,
+    addressdetails: 1,
+    email: process.env.EMAIL
+  }
+  const qp = qs.stringify(qa)
+  const url = `http://nominatim.openstreetmap.org/lookup?${qp}`
+  try {
+    // TODO: cache results
+    const nres = await fetch(url)
+    const njson = await nres.json()
+    if (!Array.isArray(njson)) {
+      throw new Error(`Unexpected result type: ${typeof njson}`)
+    }
+    if (njson.length !== 1) {
+      throw new Error(`Unexpected result length: ${njson.length}`)
+    }
+    const [nplace] = njson
+    const name = (nplace.namedetails.name) ? nplace.namedetails.name : nplace.display_name
+
+    const as2place = {
+      '@context': AS2,
+      type: 'Place',
+      id: makeURI(`/osm/${id}`),
+      name: name,
+      latitude: parseFloat(nplace.lat),
+      longitude: parseFloat(nplace.lon)
+    }
+    res.json(as2place)
+  } catch (err) {
+    next(err)
+  }
+})
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
+})
+
+app.use((err, req, res, next) => {
+  if (req.is('json')) {
+    res.json({
+      status: 'Error',
+      message: err.message
+    })
+  } else {
+    next()
+  }
 })
 
 const DEFAULT_PORT = 8080
