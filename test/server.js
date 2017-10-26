@@ -1,4 +1,4 @@
-// app-test.js -- main entry point for places.pub server
+// server.js -- main entry point for places.pub server
 //
 //  Copyright 2017 Evan Prodromou <evan@prodromou.name>
 //
