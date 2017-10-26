@@ -20,10 +20,7 @@ const vows = require('perjury')
 const {assert} = vows
 
 const Server = require('./server')
-
-const env = {
-  PORT: 8081
-}
+const env = require('./env')
 
 vows.describe('app loads and listens on correct port')
   .addBatch({
