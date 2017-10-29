@@ -18,7 +18,8 @@ const env = {
   HOSTNAME: 'localhost',
   PORT: 8081,
   EMAIL: 'test@places.pub',
-  URL_ROOT: 'https://places.pub'
+  URL_ROOT: 'https://places.pub',
+  DEBUG: process.env.DEBUG
 }
 
 module.exports = env

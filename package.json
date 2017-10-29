@@ -25,7 +25,8 @@
     "test:integration": "polymer build # test that psk builds without error with the CLI"
   },
   "dependencies": {
-    "node-fetch": "^1.7.3",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "lodash": "^4.17.4",
+    "node-fetch": "^1.7.3"
   }
 }

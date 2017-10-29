@@ -14,17 +14,66 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+const assert = require('assert')
 const express = require('express')
 const path = require('path')
 const fetch = require('node-fetch')
 const qs = require('querystring')
+const _ = require('lodash')
 
 const AS2 = 'https://www.w3.org/ns/activitystreams'
+const VCARD = 'http://www.w3.org/2006/vcard/ns#'
 
 const app = express()
 
 function makeURI (path) {
   return `${process.env.URL_ROOT}${path}`
+}
+
+function naddr2as2 (naddr) {
+  assert.ok(_.isObject(naddr))
+  const addr = {
+    type: 'vcard:Address',
+    'vcard:street-address': ((naddr.house_number) ? `${naddr.house_number} ${naddr.road}` : naddr.road),
+    'vcard:locality': naddr.city,
+    'vcard:region': naddr.state,
+    'vcard:country-name': naddr.country,
+    'vcard:postal-code': naddr.postcode
+  }
+  assert.ok(_.isObject(addr))
+  return addr
+}
+
+function nominatimToAS2 (nplace) {
+  const name = (nplace.namedetails.name) ? nplace.namedetails.name : nplace.display_name
+  let prefix = null
+  if (nplace.osm_type === 'node') {
+    prefix = 'N'
+  } else if (nplace.osm_type === 'way') {
+    prefix = 'W'
+  } else if (nplace.osm_type === 'relations') {
+    prefix = 'R'
+  } else {
+    throw new Error(`Unexpected osm_type ${nplace.osm_type}`)
+  }
+
+  const id = `${prefix}${nplace.osm_id}`
+
+  const as2place = {
+    '@context': [AS2, {vcard: VCARD}],
+    type: 'Place',
+    id: makeURI(`/osm/${id}`),
+    name: name,
+    latitude: parseFloat(nplace.lat),
+    longitude: parseFloat(nplace.lon)
+  }
+
+  if (_.isObject(nplace.address)) {
+    as2place['vcard:hasAddress'] = naddr2as2(nplace.address)
+    assert.ok(_.isObject(as2place['vcard:hasAddress']))
+  }
+
+  return as2place
 }
 
 app.use(express.static(__dirname))
@@ -54,16 +103,7 @@ app.get('/osm/:id', async (req, res, next) => {
       throw new Error(`Unexpected result length: ${njson.length}`)
     }
     const [nplace] = njson
-    const name = (nplace.namedetails.name) ? nplace.namedetails.name : nplace.display_name
-
-    const as2place = {
-      '@context': AS2,
-      type: 'Place',
-      id: makeURI(`/osm/${id}`),
-      name: name,
-      latitude: parseFloat(nplace.lat),
-      longitude: parseFloat(nplace.lon)
-    }
+    const as2place = nominatimToAS2(nplace)
     res.json(as2place)
   } catch (err) {
     next(err)
