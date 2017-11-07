@@ -1,6 +1,7 @@
 # places.pub
 
 [![Build Status](https://travis-ci.org/evanp/places-pub.svg?branch=master)](https://travis-ci.org/evanp/places-pub)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fevanp%2Fplaces-pub.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fevanp%2Fplaces-pub?ref=badge_shield)
 
 This is the source code for the [places.pub](https://places.pub/) service. It
 provides a vocabulary for [Activity Streams 2.0](https://www.w3.org/TR/activitystreams-core/) [Place](https://www.w3.org/TR/activitystreams-vocabulary/#dfn-place) objects,
@@ -21,6 +22,9 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fevanp%2Fplaces-pub.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fevanp%2Fplaces-pub?ref=badge_large)
 
 ## How to use it
 
